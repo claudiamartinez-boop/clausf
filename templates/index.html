@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>June FY27 Horserace</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #f0f4f8;
+      --surf:    #ffffff;
+      --surf2:   #f6f8fa;
+      --border:  #d0d7de;
+      --text:    #1f2328;
+      --muted:   #656d76;
+      --blue:    #0969da;
+      --blue2:   #218bff;
+      --green:   #1a7f37;
+      --green2:  #2da44e;
+      --yellow:  #9a6700;
+      --red:     #cf222e;
+      --purple:  #8250df;
+      --orange:  #bc4c00;
+      --gold:    #bf8700;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1c2b41 0%, #0f2040 100%);
+      padding: 22px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -.4px; color: #fff; }
+    .header p  { margin-top: 3px; font-size: 12px; color: rgba(255,255,255,.6); }
+    .header-right { display: flex; align-items: center; gap: 14px; }
+    .header-meta  { text-align: right; font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.7; }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--blue2);
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    /* ── Summary cards ── */
+    .cards {
+      display: flex;
+      gap: 12px;
+      padding: 18px 40px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      background: var(--surf);
+    }
+    .card {
+      flex: 1;
+      min-width: 140px;
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+    .card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 4px; }
+    .card-value { font-size: 22px; font-weight: 700; }
+    .card-value.blue   { color: var(--blue); }
+    .card-value.green  { color: var(--green); }
+    .card-value.gold   { color: var(--gold); }
+    .card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      padding: 0 40px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surf);
+    }
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+      user-select: none;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+    /* ── Sections ── */
+    .section { padding: 28px 40px; display: none; }
+    .section.active { display: block; }
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* ── Race tracks ── */
+    .tracks { display: flex; flex-direction: column; gap: 16px; }
+    .track-row {
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 40px 190px 1fr 140px;
+      align-items: center;
+      gap: 16px;
+    }
+    .rank       { font-size: 22px; text-align: center; line-height: 1; }
+    .t-name     { font-size: 14px; font-weight: 700; color: var(--text); }
+    .t-sub      { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .track-wrap {
+      position: relative;
+      height: 34px;
+      background: var(--surf2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: visible;
+    }
+    /* Finish line at 100% for velocity */
+    .track-wrap.vel::after {
+      content: '';
+      position: absolute;
+      right: -1px; top: -6px; bottom: -6px; width: 3px;
+      background: repeating-linear-gradient(to bottom, #333 0,#333 4px,#fff 4px,#fff 8px);
+      border-radius: 2px;
+      z-index: 2;
+    }
+    /* Finish line at end for pipeline */
+    .track-wrap.pip::after {
+      content: '';
+      position: absolute;
+      right: 0; top: -4px; bottom: -4px; width: 3px;
+      background: repeating-linear-gradient(to bottom, #333 0,#333 4px,#fff 4px,#fff 8px);
+      opacity: .5;
+      border-radius: 1px;
+    }
+    .t-bar {
+      height: 100%;
+      border-radius: 7px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-width: 3px;
+      max-width: 100%;
+      transition: width 1.1s cubic-bezier(.4,0,.2,1);
+      width: 0;
+    }
+    .t-bar.c1 { background: linear-gradient(90deg, #1058a0, #218bff); }
+    .t-bar.c2 { background: linear-gradient(90deg, #166534, #2da44e); }
+    .t-bar.c3 { background: linear-gradient(90deg, #6e40c9, #a371f7); }
+    .t-bar.c4 { background: linear-gradient(90deg, #8b4a0a, #f0883e); }
+    .t-bar.c5 { background: linear-gradient(90deg, #9e3333, #f85149); }
+    .t-bar.over { background: linear-gradient(90deg, #9a6700, #d4a017) !important; }
+    .bar-lbl {
+      position: absolute;
+      right: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,.95);
+      white-space: nowrap;
+    }
+    .bar-lbl.out { left: calc(100% + 8px); right: auto; color: var(--text); }
+    .stat-col { text-align: right; }
+    .stat-main { font-size: 15px; font-weight: 700; color: var(--text); }
+    .stat-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Velocity % pill */
+    .vel-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+    .vel-pill.low  { background: rgba(207,34,46,.1);  color: var(--red); }
+    .vel-pill.mid  { background: rgba(9,105,218,.1);  color: var(--blue); }
+    .vel-pill.high { background: rgba(26,127,55,.1);  color: var(--green); }
+    .vel-pill.over { background: rgba(191,135,0,.12); color: var(--gold); }
+
+    /* ── Deal View ── */
+    .avp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+      gap: 18px;
+    }
+    .avp-card {
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .avp-card-header {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .avp-name   { font-size: 14px; font-weight: 700; color: var(--text); }
+    .avp-region { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .avp-pipe-stat { text-align: right; }
+    .avp-pipe-stat .v { font-size: 13px; font-weight: 700; color: var(--blue); }
+    .avp-pipe-stat .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+    .deal-list { padding: 0; }
+    .deal-row {
+      padding: 10px 18px;
+      border-bottom: 1px solid #eaeef2;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+    .deal-row:last-child { border-bottom: none; }
+    .deal-row:hover { background: var(--surf2); }
+    .deal-rank    { font-size: 11px; font-weight: 700; color: var(--muted); margin-right: 8px; }
+    .deal-account { font-size: 13px; font-weight: 600; color: var(--text); }
+    .deal-amount  { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* ── Load Data tab ── */
+    .load-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 800px) { .load-grid { grid-template-columns: 1fr; } }
+    .load-panel {
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+    }
+    .load-panel h3  { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .load-hint {
+      background: rgba(9,105,218,.06);
+      border: 1px solid rgba(9,105,218,.15);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 12px;
+      color: var(--blue);
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .load-hint code {
+      background: rgba(9,105,218,.1);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    .load-panel textarea {
+      width: 100%;
+      height: 200px;
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: monospace;
+      font-size: 12px;
+      padding: 10px 12px;
+      resize: vertical;
+      outline: none;
+    }
+    .load-panel textarea:focus { border-color: var(--blue2); }
+    .load-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .btn-apply {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--blue);
+      border: 1px solid var(--blue);
+      color: #fff;
+    }
+    .btn-apply:hover { background: #0758c8; }
+    .load-status { font-size: 12px; color: var(--muted); }
+    .load-status.ok  { color: var(--green); }
+    .load-status.err { color: var(--red); }
+
+    /* ── Footer ── */
+    .footer { text-align: center; padding: 24px; font-size: 11px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ── Data ────────────────────────────────────────────────────────────
+const DATA = {"title":"June FY27 Horserace","subtitle":"Aaron Scime's Org — SMB AMER GRB GEO","period":"June FY27","close_date_range":"Jun 1 – Jun 30, 2026","last_updated":"2026-06-25","teams":[{"name":"Jeffrey Roy","region":"GEO - E","commit":4000000,"closed_won":2608354,"open_pipeline":3992791,"open_opp_count":208,"deals":[{"account":"Arkatechture","amount":416934},{"account":"Music Theatre International","amount":215738},{"account":"Forever, Inc.","amount":111244},{"account":"Locus Robotics","amount":100049},{"account":"Hire Horatio CX","amount":95865}]},{"name":"Courtney Galbraith","region":"GEO - S","commit":3500000,"closed_won":2125373,"open_pipeline":3434088,"open_opp_count":206,"deals":[{"account":"North American Electric Reliability Corporation","amount":261072},{"account":"Houston Association of Realtors","amount":70940},{"account":"CEO Coaching International","amount":63965},{"account":"TMRW Sports Group","amount":63062},{"account":"LINQ Services","amount":60000}]},{"name":"Jon Mickelson","region":"GEO - W","commit":4500000,"closed_won":2362330,"open_pipeline":4953933,"open_opp_count":245,"deals":[{"account":"Chainguard","amount":344520},{"account":"CEA CAPA Education Abroad","amount":288273},{"account":"Hanson Bridgett","amount":131320},{"account":"Miller Sports + Entertainment","amount":130101},{"account":"Current Home","amount":110069}]},{"name":"Andrew Magill","region":"GEO - H","commit":1085000,"closed_won":588232,"open_pipeline":1690571,"open_opp_count":71,"deals":[{"account":"Beacon BioSignals","amount":270745},{"account":"Navitas Semiconductor, Inc.","amount":174000},{"account":"Watney Robotics Inc","amount":96568},{"account":"Autoland Inc.","amount":86800},{"account":"Advanced Machine Intelligence","amount":74400}]},{"name":"Graham Carron","region":"GEO - C","commit":3600000,"closed_won":1543369,"open_pipeline":6394388,"open_opp_count":291,"deals":[{"account":"Aperture LLC","amount":324820},{"account":"Diaz Law Firm (MC)","amount":144150},{"account":"Field Nation, LLC","amount":139020},{"account":"Solesence","amount":131679},{"account":"Island","amount":123539}]}]};
+
+// ── Helpers ─────────────────────────────────────────────────────────
+const fmt  = n => '$' + Math.round(n).toLocaleString('en-US');
+const fmtM = n => n >= 1e6 ? '$' + (n/1e6).toFixed(1) + 'M' : (n >= 1e3 ? '$' + (n/1e3).toFixed(0) + 'K' : fmt(n));
+const pct  = (a,b) => b > 0 ? Math.round(a / b * 1000) / 10 : 0;
+const medal = i => ['🥇','🥈','🥉'][i] || (i+1);
+const COLORS = ['c1','c2','c3','c4','c5'];
+
+function velClass(v) {
+  if (v >= 100) return 'over';
+  if (v >= 70)  return 'high';
+  if (v >= 40)  return 'mid';
+  return 'low';
+}
+
+// ── Totals ───────────────────────────────────────────────────────────
+let T, totalWon, totalCommit, totalPipe, totalOpps, avgVel;
+
+function calcTotals() {
+  T = DATA.teams;
+  totalWon    = T.reduce((s,t) => s + t.closed_won, 0);
+  totalCommit = T.reduce((s,t) => s + t.commit,     0);
+  totalPipe   = T.reduce((s,t) => s + t.open_pipeline, 0);
+  totalOpps   = T.reduce((s,t) => s + t.open_opp_count, 0);
+  avgVel      = totalCommit > 0 ? Math.round(totalWon / totalCommit * 1000) / 10 : 0;
+}
+
+// ── Render ───────────────────────────────────────────────────────────
+function render() {
+  calcTotals();
+  const byVel  = [...T].sort((a,b) => pct(b.closed_won,b.commit) - pct(a.closed_won,a.commit));
+  const byGap  = [...T].sort((a,b) => Math.max(0,a.commit-a.closed_won) - Math.max(0,b.commit-b.closed_won));
+  const maxGap = Math.max(...T.map(t => Math.max(0, t.commit - t.closed_won)));
+
+  document.getElementById('app').innerHTML = `
+  <div class="header">
+    <div>
+      <h1>🏁 ${DATA.title}</h1>
+      <p>${DATA.subtitle}</p>
+    </div>
+    <div class="header-right">
+      <div class="header-meta">
+        <div><span class="badge">${DATA.period}</span></div>
+        <div>${DATA.close_date_range}</div>
+        <div>Updated ${DATA.last_updated}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Total Closed Won</div>
+      <div class="card-value green">${fmtM(totalWon)}</div>
+      <div class="card-sub">vs ${fmtM(totalCommit)} total commit</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Org Velocity</div>
+      <div class="card-value gold">${avgVel}%</div>
+      <div class="card-sub">of commit closed</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Open Pipeline</div>
+      <div class="card-value blue">${fmtM(totalPipe)}</div>
+      <div class="card-sub">${totalOpps.toLocaleString()} open opps</div>
+    </div>
+    <div class="card">
+      <div class="card-label">AVPs Racing</div>
+      <div class="card-value">${T.length}</div>
+      <div class="card-sub">Teams in June</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('vel',this)">🏇 Velocity Race</div>
+    <div class="tab"        onclick="switchTab('pipe',this)">🎯 Pipeline to Go</div>
+    <div class="tab"        onclick="switchTab('deal',this)">💼 Deal View</div>
+    <div class="tab"        onclick="switchTab('load',this)">📥 Load Data</div>
+  </div>
+
+  <!-- Velocity Race -->
+  <div id="sec-vel" class="section active">
+    <div class="section-title">Velocity Race — race to commit (closed won ÷ commit · finish line = 100%)</div>
+    <div class="tracks">
+      ${byVel.map((t,i) => {
+        const v = pct(t.closed_won, t.commit);
+        const barW = Math.min(v, 100);
+        const isOver = v >= 100;
+        const c = isOver ? 'over' : COLORS[i % COLORS.length];
+        return `
+        <div class="track-row">
+          <div class="rank">${medal(i)}</div>
+          <div>
+            <div class="t-name">${t.name}</div>
+            <div class="t-sub">${t.region}</div>
+          </div>
+          <div class="track-wrap vel">
+            <div class="t-bar ${c}" data-w="${barW.toFixed(1)}">
+              <span class="bar-lbl ${barW < 20 ? 'out' : ''}">${v.toFixed(1)}%</span>
+            </div>
+          </div>
+          <div class="stat-col">
+            <div class="stat-main">${fmt(t.closed_won)}</div>
+            <div class="stat-sub">of ${fmtM(t.commit)} commit</div>
+            <div><span class="vel-pill ${velClass(v)}">${v.toFixed(1)}%</span></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:16px;padding-left:256px;">
+      ▏ Finish line = 100% of commit &nbsp;·&nbsp; Gold bar = over quota
+    </p>
+  </div>
+
+  <!-- Pipeline to Go -->
+  <div id="sec-pipe" class="section">
+    <div class="section-title">Pipeline to Go — gap to commit (smaller bar = closer to done) · sorted by least remaining</div>
+    <div class="tracks">
+      ${byGap.map((t,i) => {
+        const gap      = Math.max(0, t.commit - t.closed_won);
+        const barW     = maxGap > 0 ? gap / maxGap * 100 : 0;
+        const covered  = gap > 0 ? t.open_pipeline / gap : Infinity;
+        const covPct   = Math.round(Math.min(covered, 9.99) * 10) / 10;
+        const covLabel = gap === 0 ? '✓ Done' : (covered >= 1 ? `${covPct}× covered` : `${Math.round(covered*100)}% covered`);
+        const covColor = gap === 0 ? 'var(--green)' : covered >= 1.5 ? 'var(--green)' : covered >= 1 ? 'var(--blue)' : 'var(--red)';
+        const c = COLORS[i % COLORS.length];
+        return `
+        <div class="track-row">
+          <div class="rank" style="font-size:13px;font-weight:700;color:var(--muted);">${i+1}</div>
+          <div>
+            <div class="t-name">${t.name}</div>
+            <div class="t-sub">${t.region}</div>
+          </div>
+          <div class="track-wrap pip">
+            <div class="t-bar ${c}" data-w="${barW.toFixed(1)}">
+              <span class="bar-lbl ${barW < 20 ? 'out' : ''}">${gap === 0 ? '✓ Done' : fmtM(gap)}</span>
+            </div>
+          </div>
+          <div class="stat-col">
+            <div class="stat-main">${gap === 0 ? '✓ Done' : fmt(gap)}</div>
+            <div class="stat-sub">gap to commit</div>
+            <div class="stat-sub" style="color:${covColor};font-weight:600;">${covLabel}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:16px;padding-left:256px;">
+      Gap = Commit − Closed Won &nbsp;·&nbsp; Coverage = Open Pipeline ÷ Gap
+    </p>
+  </div>
+
+  <!-- Deal View -->
+  <div id="sec-deal" class="section">
+    <div class="section-title">Top 5 Open Deals per AVP (by Cloud Open Pipe Amount)</div>
+    <div class="avp-grid">
+      ${byVel.map((t,ti) => `
+      <div class="avp-card">
+        <div class="avp-card-header">
+          <div>
+            <div class="avp-name">${medal(ti)}&nbsp; ${t.name}</div>
+            <div class="avp-region">${t.region} &nbsp;·&nbsp; ${t.open_opp_count.toLocaleString()} opps &nbsp;·&nbsp; <span style="color:var(--${velClass(pct(t.closed_won,t.commit)) === 'over' ? 'gold' : velClass(pct(t.closed_won,t.commit)) === 'high' ? 'green' : velClass(pct(t.closed_won,t.commit)) === 'mid' ? 'blue' : 'red'})">${pct(t.closed_won,t.commit).toFixed(1)}% velocity</span></div>
+          </div>
+          <div class="avp-pipe-stat">
+            <div class="v">${fmtM(t.open_pipeline)}</div>
+            <div class="l">Open Pipe</div>
+          </div>
+        </div>
+        <div class="deal-list">
+          ${(t.deals||[]).length === 0
+            ? '<div style="padding:16px;font-size:12px;color:var(--muted);text-align:center;">Import pipeline CSV to see deals</div>'
+            : (t.deals||[]).map((d,di) => `
+          <div class="deal-row">
+            <div>
+              <span class="deal-rank">#${di+1}</span>
+              <span class="deal-account">${d.account}</span>
+            </div>
+            <div class="deal-amount">${fmt(d.amount)}</div>
+          </div>`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- Load Data -->
+  <div id="sec-load" class="section">
+    <div class="section-title">Import data from Salesforce reports</div>
+    <div class="load-grid">
+
+      <!-- Velocity / Commit CSV -->
+      <div class="load-panel">
+        <h3>Velocity & Commit</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+          Paste a CSV with AVP names, commit amounts, and closed won. Updates the velocity race.
+        </p>
+        <div class="load-hint">
+          Expected columns (any order, header required):<br>
+          <code>Name</code> &nbsp; <code>Commit</code> &nbsp; <code>Closed</code><br>
+          Name can be an AVP's last name, full name, or GEO letter (C / E / H / S / W).
+        </div>
+        <textarea id="vel-csv" placeholder='Name,Commit,Closed
+Jon Mickelson,4500000,2362330
+Graham Carron,3600000,1543369
+Jeffrey Roy,4000000,2608354
+Courtney Galbraith,3500000,2125373
+Andrew Magill,1085000,588232'></textarea>
+        <div class="load-actions">
+          <button class="btn-apply" onclick="applyVelCSV()">Apply</button>
+          <span id="vel-status" class="load-status"></span>
+        </div>
+      </div>
+
+      <!-- Pipeline CSV -->
+      <div class="load-panel">
+        <h3>Open Pipeline</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+          Paste the deal-level Salesforce report. Aggregates pipeline by AVP and pulls top 5 deals.
+        </p>
+        <div class="load-hint">
+          Expected columns: <code>Account Level 5 User Role</code> &nbsp; <code>Account Name</code> &nbsp; <code>Sum of Cloud Open Pipe Amount</code><br>
+          Column order doesn't matter. Grand Total row is ignored.
+        </div>
+        <textarea id="pipe-csv" placeholder='Snap Year Status,Account Level 4 User Name,Account Level 5 User Role,Account Name,Sum of Cloud Open Pipe Amount,Unique of Opty ID 18
+CY,Aaron Scime,SMB - AMER - GRB - GEO - W - AVP,Chainguard,"$344,520",1
+...'></textarea>
+        <div class="load-actions">
+          <button class="btn-apply" onclick="applyPipeCSV()">Apply</button>
+          <span id="pipe-status" class="load-status"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">${DATA.title} &nbsp;·&nbsp; ${DATA.period} &nbsp;·&nbsp; Data as of ${DATA.last_updated}</div>
+  `;
+
+  animateBars();
+}
+
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sec-'+id).classList.add('active');
+  if (id !== 'load') animateBars();
+}
+
+function animateBars() {
+  document.querySelectorAll('[data-w]').forEach(el => {
+    const w = parseFloat(el.dataset.w) || 0;
+    el.style.width = '0%';
+    requestAnimationFrame(() => setTimeout(() => el.style.width = w+'%', 30));
+  });
+}
+
+// ── CSV parsing ──────────────────────────────────────────────────────
+function parseRow(line) {
+  const cols = []; let cur = '', inQ = false;
+  for (const c of line) {
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+    else { cur += c; }
+  }
+  cols.push(cur.trim());
+  return cols;
+}
+
+function cleanAmt(s) {
+  return parseFloat((s||'0').replace(/[$,"\s]/g,'').replace(/^-$/,'0')) || 0;
+}
+
+const GEO_MAP = { C:'GEO - C', E:'GEO - E', H:'GEO - H', S:'GEO - S', W:'GEO - W' };
+
+function geoFromRole(role) {
+  const m = role.match(/GEO\s*[-–]\s*([A-Z])\s*[-–]\s*AVP/i);
+  return m ? m[1].toUpperCase() : null;
+}
+
+function findTeam(nameOrGeo) {
+  // exact match
+  let t = DATA.teams.find(t => t.name.toLowerCase() === nameOrGeo.toLowerCase());
+  if (t) return t;
+  // last-name match
+  t = DATA.teams.find(t => t.name.split(' ').pop().toLowerCase() === nameOrGeo.toLowerCase().split(' ').pop());
+  if (t) return t;
+  // geo letter
+  const geo = GEO_MAP[nameOrGeo.toUpperCase()];
+  if (geo) return DATA.teams.find(t => t.region === geo);
+  // region string
+  return DATA.teams.find(t => t.region.toLowerCase() === nameOrGeo.toLowerCase());
+}
+
+// Apply Velocity CSV
+function applyVelCSV() {
+  const text = document.getElementById('vel-csv').value.trim();
+  const st   = document.getElementById('vel-status');
+  if (!text) { st.className='load-status err'; st.textContent='Paste CSV first.'; return; }
+  const rows = text.split(/\r?\n/).filter(r => r.trim());
+  const hdrs = parseRow(rows[0]).map(h => h.toLowerCase());
+  const nameI   = hdrs.findIndex(h => /^name|avp|person/i.test(h));
+  const commitI = hdrs.findIndex(h => /commit|quota/i.test(h));
+  const closedI = hdrs.findIndex(h => /closed|won|actual/i.test(h));
+  if (nameI<0||commitI<0||closedI<0) {
+    st.className='load-status err';
+    st.textContent='Need columns: Name, Commit, Closed.';
+    return;
+  }
+  let updated=0;
+  for (let i=1; i<rows.length; i++) {
+    const c = parseRow(rows[i]);
+    const t = findTeam(c[nameI]||'');
+    if (!t) continue;
+    t.commit     = cleanAmt(c[commitI]);
+    t.closed_won = cleanAmt(c[closedI]);
+    updated++;
+  }
+  if (!updated) { st.className='load-status err'; st.textContent='No rows matched known AVP names.'; return; }
+  DATA.last_updated = new Date().toISOString().slice(0,10);
+  render();
+  document.getElementById('vel-status').className='load-status ok';
+  document.getElementById('vel-status').textContent=`✓ ${updated} team${updated!==1?'s':''} updated.`;
+}
+
+// Apply Pipeline CSV
+function applyPipeCSV() {
+  const text = document.getElementById('pipe-csv').value.trim();
+  const st   = document.getElementById('pipe-status');
+  if (!text) { st.className='load-status err'; st.textContent='Paste CSV first.'; return; }
+  const rows = text.split(/\r?\n/).filter(r => r.trim());
+  const hdrs = parseRow(rows[0]).map(h => h.toLowerCase());
+  const roleI  = hdrs.findIndex(h => /role|level.5|avp/i.test(h) || h.includes('user role'));
+  const acctI  = hdrs.findIndex(h => /account.name|acct.name/i.test(h) || h === 'account name');
+  const amtI   = hdrs.findIndex(h => /amount|pipe|cloud/i.test(h) && !h.includes('level'));
+  const cntI   = hdrs.findIndex(h => /count|unique/i.test(h));
+  if (roleI<0||acctI<0||amtI<0) {
+    st.className='load-status err';
+    st.textContent='Need: Account Level 5 User Role, Account Name, Sum of Cloud Open Pipe Amount.';
+    return;
+  }
+
+  // Group by geo
+  const grouped = {};
+  for (let i=1; i<rows.length; i++) {
+    const c = parseRow(rows[i]);
+    const role = c[roleI]||'';
+    if (/total|grand/i.test(role)) continue;
+    const geo = geoFromRole(role);
+    if (!geo) continue;
+    if (!grouped[geo]) grouped[geo] = { total:0, count:0, deals:[] };
+    const amt = cleanAmt(c[amtI]);
+    const cnt = cntI>=0 ? (parseInt((c[cntI]||'1').replace(/,/g,''))||1) : 1;
+    grouped[geo].total += amt;
+    grouped[geo].count += cnt;
+    grouped[geo].deals.push({ account: c[acctI]||'', amount: amt });
+  }
+
+  let updated=0;
+  for (const [geo, vals] of Object.entries(grouped)) {
+    const region = GEO_MAP[geo];
+    if (!region) continue;
+    let t = DATA.teams.find(t => t.region === region);
+    if (!t) {
+      t = { name: geo+' – Open AVP', region, commit:0, closed_won:0, open_pipeline:0, open_opp_count:0, deals:[] };
+      DATA.teams.push(t);
+    }
+    t.open_pipeline  = vals.total;
+    t.open_opp_count = vals.count;
+    t.deals = vals.deals.sort((a,b)=>b.amount-a.amount).slice(0,5);
+    updated++;
+  }
+  if (!updated) { st.className='load-status err'; st.textContent='No rows matched GEO - X - AVP pattern.'; return; }
+  DATA.last_updated = new Date().toISOString().slice(0,10);
+  render();
+  document.getElementById('pipe-status').className='load-status ok';
+  document.getElementById('pipe-status').textContent=`✓ Pipeline updated for ${updated} team${updated!==1?'s':''}.`;
+}
+
+// ── Bootstrap ────────────────────────────────────────────────────────
+fetch('/api/data')
+  .then(r => r.ok ? r.json() : null)
+  .then(d => { if (d) Object.assign(DATA, d); render(); })
+  .catch(() => render());
+</script>
+</body>
+</html>

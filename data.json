@@ -1,0 +1,84 @@
+{
+  "title": "June FY27 Horserace",
+  "subtitle": "Aaron Scime's Org — SMB AMER GRB GEO",
+  "period": "June FY27",
+  "close_date_range": "Jun 1 – Jun 30, 2026",
+  "last_updated": "2026-06-25",
+  "teams": [
+    {
+      "name": "Jeffrey Roy",
+      "region": "GEO - E",
+      "commit": 4000000,
+      "closed_won": 2608354,
+      "open_pipeline": 3992791,
+      "open_opp_count": 208,
+      "deals": [
+        { "account": "Arkatechture",                "amount": 416934 },
+        { "account": "Music Theatre International", "amount": 215738 },
+        { "account": "Forever, Inc.",               "amount": 111244 },
+        { "account": "Locus Robotics",              "amount": 100049 },
+        { "account": "Hire Horatio CX",             "amount": 95865  }
+      ]
+    },
+    {
+      "name": "Courtney Galbraith",
+      "region": "GEO - S",
+      "commit": 3500000,
+      "closed_won": 2125373,
+      "open_pipeline": 3434088,
+      "open_opp_count": 206,
+      "deals": [
+        { "account": "North American Electric Reliability Corporation", "amount": 261072 },
+        { "account": "Houston Association of Realtors",                 "amount": 70940  },
+        { "account": "CEO Coaching International",                      "amount": 63965  },
+        { "account": "TMRW Sports Group",                               "amount": 63062  },
+        { "account": "LINQ Services",                                   "amount": 60000  }
+      ]
+    },
+    {
+      "name": "Jon Mickelson",
+      "region": "GEO - W",
+      "commit": 4500000,
+      "closed_won": 2362330,
+      "open_pipeline": 4953933,
+      "open_opp_count": 245,
+      "deals": [
+        { "account": "Chainguard",                     "amount": 344520 },
+        { "account": "CEA CAPA Education Abroad",      "amount": 288273 },
+        { "account": "Hanson Bridgett",                "amount": 131320 },
+        { "account": "Miller Sports + Entertainment",  "amount": 130101 },
+        { "account": "Current Home",                   "amount": 110069 }
+      ]
+    },
+    {
+      "name": "Andrew Magill",
+      "region": "GEO - H",
+      "commit": 1085000,
+      "closed_won": 588232,
+      "open_pipeline": 1690571,
+      "open_opp_count": 71,
+      "deals": [
+        { "account": "Beacon BioSignals",               "amount": 270745 },
+        { "account": "Navitas Semiconductor, Inc.",     "amount": 174000 },
+        { "account": "Watney Robotics Inc",             "amount": 96568  },
+        { "account": "Autoland Inc.",                   "amount": 86800  },
+        { "account": "Advanced Machine Intelligence",   "amount": 74400  }
+      ]
+    },
+    {
+      "name": "Graham Carron",
+      "region": "GEO - C",
+      "commit": 3600000,
+      "closed_won": 1543369,
+      "open_pipeline": 6394388,
+      "open_opp_count": 291,
+      "deals": [
+        { "account": "Aperture LLC",          "amount": 324820 },
+        { "account": "Diaz Law Firm (MC)",    "amount": 144150 },
+        { "account": "Field Nation, LLC",     "amount": 139020 },
+        { "account": "Solesence",             "amount": 131679 },
+        { "account": "Island",               "amount": 123539 }
+      ]
+    }
+  ]
+}
